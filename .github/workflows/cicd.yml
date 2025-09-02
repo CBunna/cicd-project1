@@ -84,7 +84,7 @@ jobs:
           git config --local user.name "GitHub Action"
 
           # Commit and push changes
-          git add k8s/deployment.yaml
+          git add k8s/deployment.yml
           git commit -m "🚀 Update deployment image to main-${{ github.sha }}"
           git push
 
