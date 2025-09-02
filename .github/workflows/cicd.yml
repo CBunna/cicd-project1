@@ -8,6 +8,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -27,16 +28,20 @@ jobs:
           sleep 5
           curl http://localhost:3000/health
           pkill node
+
   build-and-push:
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
-      contents: read
+      contents: write # Changed from 'read' to 'write' to update manifests
       packages: write
     steps:
       - name: Check Out the code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Log in to Container Registry
         uses: docker/login-action@v3
@@ -64,9 +69,29 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      # NEW STEP: Update Kubernetes manifest
+      - name: Update Kubernetes manifest
+        run: |
+          # Create the new image tag with commit SHA
+          NEW_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main-${{ github.sha }}"
+          echo "🏷️  Updating deployment to use: $NEW_IMAGE"
+
+          # Update the deployment file (adjust path as needed)
+          sed -i "s|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:.*|image: $NEW_IMAGE|g" k8s/deployment.yaml
+
+          # Configure git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          # Commit and push changes
+          git add k8s/deployment.yaml
+          git commit -m "🚀 Update deployment image to main-${{ github.sha }}"
+          git push
+
       - name: Print image details
         run: |
           echo "🐳 Docker image built and pushed successfully!"
           echo "📦 Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
           echo "🏷️  Tags: ${{ steps.meta.outputs.tags }}"
-          echo "✅ Ready for manual deployment or ArgoCD setup later"
+          echo "📝 Kubernetes manifest updated with SHA: main-${{ github.sha }}"
+          echo "✅ ArgoCD should now detect and sync the changes!"
