@@ -17,11 +17,7 @@ spec:
     spec:
       containers:
       - name: task-manager
-<<<<<<< HEAD
-        image: ghcr.io/cbunna/cicd-project1:main-660ed891602d31bd4712c45374622a0ded685a85
-=======
-        image: ghcr.io/cbunna/cicd-project1:main-660ed891602d31bd4712c45374622a0ded685a85
->>>>>>> c0c529dac8ea51b600fea7fc5c80a3de17a1aba4
+        image: ghcr.io/cbunna/cicd-project1:main-660ed89
         ports:
         - containerPort: 3000
         env:

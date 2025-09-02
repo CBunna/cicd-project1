@@ -74,8 +74,8 @@ jobs:
       # NEW STEP: Update Kubernetes manifest
       - name: Update Kubernetes manifest
         run: |
-          # Create the new image tag with commit SHA
-          NEW_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main-${{ github.sha }}"
+          # Create the new image tag with commit SHA (short)
+          NEW_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main-${GITHUB_SHA:0:7}"
           echo "🏷️  Updating deployment to use: $NEW_IMAGE"
 
           # Update the deployment file (adjust path as needed)
@@ -90,7 +90,7 @@ jobs:
             echo "✅ No changes to deployment file - already up to date"
           else
             git add k8s/deployment.yml
-            git commit -m "🚀 Update deployment image to main-${{ github.sha }}"
+            git commit -m "🚀 Update deployment image to main-${GITHUB_SHA:0:7}"
             git push
             echo "✅ Deployment file updated and pushed"
           fi
@@ -100,5 +100,5 @@ jobs:
           echo "🐳 Docker image built and pushed successfully!"
           echo "📦 Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
           echo "🏷️  Tags: ${{ steps.meta.outputs.tags }}"
-          echo "📝 Kubernetes manifest updated with SHA: main-${{ github.sha }}"
+          echo "📝 Kubernetes manifest updated with SHA: main-${GITHUB_SHA:0:7}"
           echo "✅ ArgoCD should now detect and sync the changes!"
