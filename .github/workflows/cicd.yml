@@ -85,10 +85,15 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-          # Commit and push changes
-          git add k8s/deployment.yml
-          git commit -m "🚀 Update deployment image to main-${{ github.sha }}"
-          git push
+          # Only commit if there are changes
+          if git diff --quiet k8s/deployment.yml; then
+            echo "✅ No changes to deployment file - already up to date"
+          else
+            git add k8s/deployment.yml
+            git commit -m "🚀 Update deployment image to main-${{ github.sha }}"
+            git push
+            echo "✅ Deployment file updated and pushed"
+          fi
 
       - name: Print image details
         run: |
