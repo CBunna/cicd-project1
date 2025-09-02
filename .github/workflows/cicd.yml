@@ -77,7 +77,7 @@ jobs:
           echo "🏷️  Updating deployment to use: $NEW_IMAGE"
 
           # Update the deployment file (adjust path as needed)
-          sed -i "s|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:.*|image: $NEW_IMAGE|g" k8s/deployment.yaml
+          sed -i "s|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:.*|image: $NEW_IMAGE|g" k8s/deployment.yml
 
           # Configure git
           git config --local user.email "action@github.com"
