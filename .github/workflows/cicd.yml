@@ -2,6 +2,8 @@ name: CICD / Pipline
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "k8s/deployment.yml"
   pull_request:
     branches: [main]
 
